@@ -8,7 +8,7 @@ class Rental
     @person = person
   end
 
-  def belongs_to?(book)
+  def belongs_to?
     @book = self
   end
 
