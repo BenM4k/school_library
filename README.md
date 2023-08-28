@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <div align="center">
-  <h1><b>Enumerable</b></h1>
+  <h1><b>School Library</b></h1>
 </div>
 
 <!-- TABLE OF CONTENTS -->
@@ -26,9 +26,9 @@
 
 <!-- PROJECT DESCRIPTION -->
 
-# 📖 Enumerable <a name="about-project"></a>
+# 📖 School Library <a name="about-project"></a>
 
-**Enumerable** is an app to decode morse code using Ruby.
+**School Library** is an app that helps you get familiar with the principles of Object Oriented Programming (OOP).
 
 ## 🛠 Built With <a name="built-with"></a>
 
@@ -67,7 +67,7 @@ In order to run this project you need:
 Clone this repository to your desired folder:
 
 ```bash
-  git clone https://github.com/BenM4k/decode_morse
+  git clone https://github.com/BenM4k/school_library
 ```
 
 ### Install
@@ -92,12 +92,6 @@ Install this project with:
 - GitHub: [Github](https://github.com/BenM4k)
 - Twitter: [Twitter](https://twitter.com/______ANOMALY)
 - LinkedIn: [LinkedIn](https://www.linkedin.com/in/benedict-makomo/)
-
-👤 **Innocent Ndahimana**
-
-- GitHub: [@innocent259](https://github.com/Innocent259)
-- Twitter: [@innocentndahimana](https://www.linkedin.com/in/innocent259/)
-- LinkedIn: [@innocentndahimana](https://twitter.com/ndahimana259)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
