@@ -6,7 +6,7 @@ class Classroom
     @students = []
   end
 
-  def many?(student)
+  def add_student(student)
     @students.push(student)
     student.belongs_to = self
   end

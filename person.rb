@@ -21,9 +21,8 @@ class Person < Nameable
     @name
   end
 
-  def many?(rental)
-    @rentals.push(student)
-    rental.belongs_to = self
+  def add_rental(person, date)
+    Rental.new(date, self, person)
   end
 
   private

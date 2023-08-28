@@ -5,14 +5,8 @@ class Rental
   def initialize(date, book, person)
     @date = date
     @book = book
+    book.rentals.push(self) unless book.rentals.include?(self)
     @person = person
-  end
-
-  def belongs_to?
-    @book = self
-  end
-
-  def belongs_to_a_person?
-    @person = self
+    person.rentals.push(self) unless person.rentals.include?(self)
   end
 end
