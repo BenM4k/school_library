@@ -12,7 +12,7 @@ class Student < Person
     '¯\(ツ)/¯'
   end
 
-  def belongs_to?(classroom)
-    @classroom = classroom
+  def belongs_to?
+    @classroom = self
   end
 end

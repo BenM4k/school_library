@@ -2,17 +2,17 @@ class Rental
   attr_accessor :date
   attr_reader :book, :person
 
-  def initialize(date)
+  def initialize(date, book, person)
     @date = date
-    @book = nil
-    @person = nil
+    @book = book
+    @person = person
   end
 
   def belongs_to?(book)
-    @book = book
+    @book = self
   end
 
-  def belongs_to_a_person?(person)
-    @person = person
+  def belongs_to_a_person?
+    @person = self
   end
 end
