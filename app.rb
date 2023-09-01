@@ -201,7 +201,7 @@ class App
 
   def run(choice)
     case choice
-    when 1 then list_all_books(@all_books)
+    when 1 then list_all_books()
     when 2 then list_all_people(@all_students, @all_teachers)
     when 3 then create_person
     when 4 then create_book(@all_books)
