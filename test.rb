@@ -21,11 +21,11 @@ class App
 
   def run
     loop do
-      puts "Options:"
-      puts "1. Add Person"
-      puts "2. List People"
-      puts "3. Exit"
-      print "Enter your choice: "
+      puts 'Options:'
+      puts '1. Add Person'
+      puts '2. List People'
+      puts '3. Exit'
+      print 'Enter your choice: '
       choice = gets.chomp.to_i
 
       case choice
@@ -37,7 +37,7 @@ class App
         save_people_to_file
         break
       else
-        puts "Invalid choice"
+        puts 'Invalid choice'
       end
     end
   end
@@ -45,28 +45,28 @@ class App
   private
 
   def add_person
-    print "Enter name: "
+    print 'Enter name: '
     name = gets.chomp
-    print "Enter age: "
+    print 'Enter age: '
     age = gets.chomp.to_i
 
     person = Person.new(name, age)
     @people << person
-    puts "Person added!"
+    puts 'Person added!'
   end
 
   def list_people
-    puts "People List:"
+    puts 'People List:'
     @people.each_with_index do |person, index|
       puts "#{index + 1}. Name: #{person.name}, Age: #{person.age}"
     end
   end
 
   def load_people_from_file
-    if File.exist?('people.json')
-      json_data = File.read('people.json')
-      @people = JSON.parse(json_data).map { |hash| Person.new(hash['name'], hash['age']) }
-    end
+    return unless File.exist?('people.json')
+
+    json_data = File.read('people.json')
+    @people = JSON.parse(json_data).map { |hash| Person.new(hash['name'], hash['age']) }
   end
 
   def save_people_to_file

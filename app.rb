@@ -158,31 +158,33 @@ class App
   end
 
   def read_students
-    if File.exist?('students.json')
-      json_file = File.read('students.json')
-      @all_students = JSON.parse(json_file).map { |hash| Student.new(hash['date'], hash['book'], hash['person'])}
-    end
+    return unless File.exist?('students.json')
+
+    json_file = File.read('students.json')
+    @all_students = JSON.parse(json_file).map { |hash| Student.new(hash['date'], hash['book'], hash['person']) }
   end
 
   def read_teachers
-    if File.exist?('teachers.json')
-      json_file = File.read('teachers.json')
-      @all_teachers = JSON.parse(json_file).map { |hash| Teacher.new(hash['age'], hash['name'], hash['specialization'])}
+    return unless File.exist?('teachers.json')
+
+    json_file = File.read('teachers.json')
+    @all_teachers = JSON.parse(json_file).map do |hash|
+      Teacher.new(hash['age'], hash['name'], hash['specialization'])
     end
   end
 
   def read_books
-    if File.exist?('books.json')
-      json_file = File.read('books.json')
-      @all_books = JSON.parse(json_file).map { |hash| Book.new(hash['title'], hash['author'])}
-    end
+    return unless File.exist?('books.json')
+
+    json_file = File.read('books.json')
+    @all_books = JSON.parse(json_file).map { |hash| Book.new(hash['title'], hash['author']) }
   end
 
   def read_rentals
-    if File.exist?('rentals.json')
-      json_file = File.read('rentals.json')
-      @all_rentals = JSON.parse(json_file).map { |hash| Rental.new(hash['age'], hash['name'], hash['specialization'])}
-    end
+    return unless File.exist?('rentals.json')
+
+    json_file = File.read('rentals.json')
+    @all_rentals = JSON.parse(json_file).map { |hash| Rental.new(hash['age'], hash['name'], hash['specialization']) }
   end
 
   def header
