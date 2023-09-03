@@ -1,15 +1,26 @@
 require 'json'
-%w[book classroom nameable
+require 'pry'
+%w[book classroom hashes nameable
    person rental student
    teacher].each { |file| require_relative file }
 
 class App
+  attr_accessor :all_books, :all_students, :all_teachers, :all_rentals
+
   def initialize
     @all_students = []
     @all_teachers = []
     @all_books = []
     @all_rentals = []
     read_lists
+  end
+
+  def read_lists
+    hashes = Hashes.new
+    @all_books = hashes.read_books(@all_books)
+    @all_students = hashes.read_students(@all_students)
+    @all_teachers = hashes.read_teachers(@all_teachers)
+    # @all_rentals = hashes.read_rentals(@all_rentals, @all_students + @all_teachers)
   end
 
   def list_all_books(container = [])
@@ -37,81 +48,6 @@ class App
     end
   end
 
-  def create_person
-    banner('Create a person')
-    print 'Do you want to create a student (1) or a teacher (2)? [input the number] >> '
-    choice = gets.chomp.to_i
-    case choice
-    when 1
-      create_student(@all_students)
-    when 2
-      create_teacher(@all_teachers)
-    else
-      puts 'Invalid input'
-    end
-  end
-
-  def create_student(classroom)
-    puts 'Create a student'
-    print 'Age: '
-    age = gets.chomp.to_i
-    print 'Name: '
-    name = gets.chomp
-    print 'Has parent permission? [y/n]'
-    gets.chomp
-    new_classroom = Classroom.new('Class A')
-    student = Student.new(age, name, new_classroom.label)
-    classroom.push(student)
-    puts 'Person created successfully'
-  end
-
-  def create_teacher(classroom)
-    puts 'Create a teacher'
-    print 'Age: '
-    age = gets.chomp.to_i
-    print 'Name: '
-    name = gets.chomp
-    print 'Specialization: '
-    spec = gets.chomp
-    teacher = Teacher.new(age, name, spec)
-    classroom.push(teacher)
-    puts classroom
-    puts 'Person created successfully'
-  end
-
-  def create_book(shelf)
-    banner('Create a book')
-    print 'Title: '
-    title = gets.chomp
-    print 'Author: '
-    author = gets.chomp
-    book = Book.new(title, author)
-    puts book
-    shelf.push(book)
-    puts 'Book created successfully'
-  end
-
-  def create_rental(container, shelf, group)
-    banner('Create a rental')
-    if shelf.empty?
-      puts 'No books to display'
-    else
-      puts 'Select a book from the following list by number '
-      shelf.each_with_index { |book, i| puts "#{i}) Title: #{book.title}, Author: #{book.author} \n" }
-      book_choice = gets.chomp.to_i
-      selected_book = shelf[book_choice]
-      puts 'Select a person from the following list by number (not id)'
-      group.each_with_index { |person, i| puts "#{i}) Name: #{person.name}, ID: #{person.id}, Age: #{person.age}" }
-      person_choice = gets.chomp.to_i
-      selected_person = group[person_choice]
-      print 'Date: '
-      date = gets.chomp
-      rental = Rental.new(date, selected_book, selected_person)
-      container.push(rental)
-      puts 'Rental created successfully'
-    end
-  end
-
   def list_all_rentals(container)
     banner('All available rentals')
     if container.empty?
@@ -136,55 +72,12 @@ class App
     puts ''.center(50, '*')
   end
 
-  def save_json(file, list)
-    puts list
-    puts file
-    json_data = list.map(&:to_hash).to_json
-    File.write(file, json_data)
-  end
-
   def save_lists
-    save_json('books.json', @all_books)
-    save_json('students.json', @all_students)
-    save_json('teachers.json', @all_teachers)
-    save_json('rentals.json', @all_rentals)
-  end
-
-  def read_lists
-    read_books
-    read_rentals
-    read_students
-    read_teachers
-  end
-
-  def read_students
-    return unless File.exist?('students.json')
-
-    json_file = File.read('students.json')
-    @all_students = JSON.parse(json_file).map { |hash| Student.new(hash['date'], hash['book'], hash['person']) }
-  end
-
-  def read_teachers
-    return unless File.exist?('teachers.json')
-
-    json_file = File.read('teachers.json')
-    @all_teachers = JSON.parse(json_file).map do |hash|
-      Teacher.new(hash['age'], hash['name'], hash['specialization'])
-    end
-  end
-
-  def read_books
-    return unless File.exist?('books.json')
-
-    json_file = File.read('books.json')
-    @all_books = JSON.parse(json_file).map { |hash| Book.new(hash['title'], hash['author']) }
-  end
-
-  def read_rentals
-    return unless File.exist?('rentals.json')
-
-    json_file = File.read('rentals.json')
-    @all_rentals = JSON.parse(json_file).map { |hash| Rental.new(hash['age'], hash['name'], hash['specialization']) }
+    hashes = Hashes.new
+    hashes.save_book('books.json', @all_books)
+    hashes.save_student('students.json', @all_students)
+    hashes.save_teacher('teachers.json', @all_teachers)
+    hashes.save_rental('rentals.json', @all_rentals)
   end
 
   def header
@@ -200,14 +93,94 @@ class App
   end
 
   def run(choice)
+    create = Create.new
     case choice
-    when 1 then list_all_books()
+    when 1 then list_all_books(@all_books)
     when 2 then list_all_people(@all_students, @all_teachers)
-    when 3 then create_person
-    when 4 then create_book(@all_books)
-    when 5 then create_rental(@all_rentals, @all_books, @all_students + @all_teachers)
+    when 3 then create.person?(@all_students, @all_teachers)
+    when 4 then create.book?(@all_books)
+    when 5 then create.rental(@all_rentals, @all_books, @all_students + @all_teachers)
     when 6 then list_all_rentals(@all_rentals)
     else puts 'Invalid entry'
+    end
+  end
+end
+
+class Create
+  def initialize
+    @banner = App.new
+  end
+
+  def student?(classroom)
+    puts 'Create a student'
+    print 'Age: '
+    age = gets.chomp.to_i
+    print 'Name: '
+    name = gets.chomp
+    print 'Has parent permission? [y/n]'
+    gets.chomp
+    new_classroom = Classroom.new('Class A')
+    student = Student.new(age, name, new_classroom.label)
+    classroom.push(student)
+    puts 'Person created successfully'
+  end
+
+  def person?(students, teachers)
+    @banner.banner('Create a person')
+    print 'Do you want to create a student (1) or a teacher (2)? [input the number] >> '
+    choice = gets.chomp.to_i
+    case choice
+    when 1
+      student?(students)
+    when 2
+      teacher?(teachers)
+    else
+      puts 'Invalid input'
+    end
+  end
+
+  def teacher?(classroom)
+    puts 'Create a teacher'
+    print 'Age: '
+    age = gets.chomp.to_i
+    print 'Name: '
+    name = gets.chomp
+    print 'Specialization: '
+    spec = gets.chomp
+    teacher = Teacher.new(age, name, spec)
+    classroom.push(teacher)
+    puts 'Person created successfully'
+  end
+
+  def book?(shelf)
+    @banner.banner('Create a book')
+    print 'Title: '
+    title = gets.chomp
+    print 'Author: '
+    author = gets.chomp
+    book = Book.new(title, author)
+    shelf.push(book)
+    puts 'Book created successfully'
+  end
+
+  def rental?(container, shelf, group)
+    @banner.banner('Create a rental')
+    if shelf.empty?
+      puts 'No books to display'
+    else
+      puts 'Select a book from the following list by number '
+      shelf.each_with_index { |book, i| puts "#{i}) Title: #{book.title}, Author: #{book.author} \n" }
+      book_choice = gets.chomp.to_i
+      selected_book = shelf[book_choice]
+      puts 'Select a person from the following list by number (not id)'
+      group.each_with_index { |person, i| puts "#{i}) Name: #{person.name}, ID: #{person.id}, Age: #{person.age}" }
+      person_choice = gets.chomp.to_i
+      selected_person = group[person_choice]
+      print 'Date: '
+      date = gets.chomp
+      rental = Rental.new(date, selected_book, selected_person)
+      container.push(rental)
+      puts 'Rental created successfully'
     end
   end
 end
