@@ -4,30 +4,16 @@ require 'pry'
    person rental student
    teacher].each { |file| require_relative file }
 
-class App
-  attr_accessor :all_books, :all_students, :all_teachers, :all_rentals
-
+class Listers
   def initialize
-    @all_students = []
-    @all_teachers = []
-    @all_books = []
-    @all_rentals = []
-    read_lists
-  end
-
-  def read_lists
-    hashes = Hashes.new
-    @all_books = hashes.read_books(@all_books)
-    @all_students = hashes.read_students(@all_students)
-    @all_teachers = hashes.read_teachers(@all_teachers)
-    # @all_rentals = hashes.read_rentals(@all_rentals, @all_students + @all_teachers)
+    @banner = Display.new
   end
 
   def list_all_books(container = [])
     if container.empty?
       puts 'No books available'
     else
-      banner('All available books')
+      @banner.banner('All available books')
       container.each do |book|
         puts "Title: #{book.title}, Author: #{book.author}"
       end
@@ -35,7 +21,7 @@ class App
   end
 
   def list_all_people(students, teachers)
-    banner('All available people')
+    @banner.banner('All available people')
     if students.length.positive? || teachers.length.positive?
       students.each do |student|
         puts "[student] Name: #{student.name}, ID: #{student.id} ,Age: #{student.age}"
@@ -49,7 +35,7 @@ class App
   end
 
   def list_all_rentals(container)
-    banner('All available rentals')
+    @banner.banner('All available rentals')
     if container.empty?
       puts 'No rentals available'
     else
@@ -63,13 +49,24 @@ class App
       end
     end
   end
+end
 
-  def banner(title)
-    puts ''.center(50, '*')
-    puts '**' << ''.center(46) << '**'
-    puts '**' << title.center(46) << '**'
-    puts '**' << ''.center(46) << '**'
-    puts ''.center(50, '*')
+class Library
+  attr_accessor :books, :students, :teachers, :rentals
+
+  def initialize
+    @students = []
+    @teachers = []
+    @books = []
+    @rentals = []
+  end
+
+  def read_lists
+    hashes = Hashes.new
+    @all_books = hashes.read_books(@all_books)
+    @all_students = hashes.read_students(@all_students)
+    @all_teachers = hashes.read_teachers(@all_teachers)
+    # @all_rentals = hashes.read_rentals(@all_rentals, @all_students + @all_teachers)
   end
 
   def save_lists
@@ -79,7 +76,16 @@ class App
     hashes.save_teacher('teachers.json', @all_teachers)
     hashes.save_rental('rentals.json', @all_rentals)
   end
+end
 
+class Display
+  def banner(title)
+    puts ''.center(50, '*')
+    puts '**' << ''.center(46) << '**'
+    puts '**' << title.center(46) << '**'
+    puts '**' << ''.center(46) << '**'
+    puts ''.center(50, '*')
+  end
   def header
     banner('Welcome to SCHOOL LIBRARY App')
     puts 'Please choose an option by entering a number:'
@@ -91,24 +97,11 @@ class App
     puts '6 - List all rentals for a given person id '
     puts '7 - Exit '
   end
-
-  def run(choice)
-    create = Create.new
-    case choice
-    when 1 then list_all_books(@all_books)
-    when 2 then list_all_people(@all_students, @all_teachers)
-    when 3 then create.person?(@all_students, @all_teachers)
-    when 4 then create.book?(@all_books)
-    when 5 then create.rental(@all_rentals, @all_books, @all_students + @all_teachers)
-    when 6 then list_all_rentals(@all_rentals)
-    else puts 'Invalid entry'
-    end
-  end
 end
 
 class Create
   def initialize
-    @banner = App.new
+    @banner = Display.new
   end
 
   def student?(classroom)
@@ -181,6 +174,27 @@ class Create
       rental = Rental.new(date, selected_book, selected_person)
       container.push(rental)
       puts 'Rental created successfully'
+    end
+  end
+end
+
+class App
+  attr_accessor :library, :create, :lister
+  def initialize
+    @library = Library.new
+    @create = Create.new
+    @lister = Listers.new
+  end
+
+  def run(choice)
+    case choice
+    when 1 then lister.list_all_books(library.books)
+    when 2 then lister.list_all_people(library.students, library.teachers)
+    when 3 then create.person?(library.students, library.teachers)
+    when 4 then create.book?(library.books)
+    when 5 then create.rental(library.rentals, library.books, library.students + library.teachers)
+    when 6 then lister.list_all_rentals(library.rentals)
+    else puts 'Invalid entry'
     end
   end
 end

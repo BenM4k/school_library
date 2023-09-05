@@ -2,8 +2,9 @@ require_relative 'app'
 
 def main
   app = App.new
+  display = Display.new
   loop do
-    app.header
+    display.header
     choice = gets.chomp.to_i
     unless choice != 7
       app.save_lists

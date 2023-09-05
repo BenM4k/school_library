@@ -24,7 +24,9 @@ class Hashes
       person_name: rental.person.name
     }
   end
+end
 
+class Savers
   def save_student(file, list)
     json_data = list.map { |student| hash_student(student) }.to_json
     File.write(file, json_data)
@@ -44,7 +46,9 @@ class Hashes
     json_data = list.map { |rental| hash_rental(rental) }.to_json
     File.write(file, json_data)
   end
+end
 
+class Readers
   def read_students(_students)
     return unless File.exist?('students.json')
 
